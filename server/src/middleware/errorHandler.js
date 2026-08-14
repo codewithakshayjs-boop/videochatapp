@@ -1,0 +1,1 @@
+export function errorHandler(error, req, res, next) { console.error(error.message); if (error.name === 'ZodError') return res.status(400).json({ success: false, message: error.issues[0]?.message || 'Invalid request.' }); res.status(500).json({ success: false, message: 'Something went wrong.' }); }

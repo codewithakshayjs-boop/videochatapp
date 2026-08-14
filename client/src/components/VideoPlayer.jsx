@@ -1,0 +1,2 @@
+import { useEffect, useRef } from 'react';
+export default function VideoPlayer({ stream, muted = false, className = '', label }) { const ref = useRef(); useEffect(() => { if (ref.current) ref.current.srcObject = stream || null; }, [stream]); return <div className={`video-frame ${className}`}><video ref={ref} autoPlay playsInline muted={muted} />{!stream && <div className="video-empty">{label}</div>}</div>; }

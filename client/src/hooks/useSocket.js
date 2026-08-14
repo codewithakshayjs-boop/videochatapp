@@ -1,0 +1,2 @@
+import { useEffect, useRef, useState } from 'react'; import { createSocket } from '../services/socket';
+export function useSocket() { const socketRef = useRef(createSocket()); const [connected, setConnected] = useState(socketRef.current.connected); useEffect(() => { const socket = socketRef.current; const up = () => setConnected(true); const down = () => setConnected(false); socket.on('connect', up); socket.on('disconnect', down); return () => { socket.off('connect', up); socket.off('disconnect', down); }; }, []); return { socket: socketRef, connected }; }

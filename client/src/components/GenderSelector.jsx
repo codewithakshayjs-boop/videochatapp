@@ -1,0 +1,1 @@
+export default function GenderSelector({ value, onChange }) { return <div className="gender-grid">{[['male', '♂', 'Male'], ['female', '♀', 'Female']].map(([key, icon, label]) => <button type="button" onClick={() => onChange(key)} className={`gender-card ${value === key ? 'selected' : ''}`} key={key}><span>{icon}</span><strong>{label}</strong></button>)}</div>; }

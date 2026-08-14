@@ -1,0 +1,1 @@
+export default function LoadingScreen({ title = 'Finding someone for you…', children }) { return <section className="search-card"><div className="pulse-orb"><span>✦</span></div><h1>{title}</h1><p>{children}</p></section>; }

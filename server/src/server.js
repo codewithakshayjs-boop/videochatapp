@@ -1,0 +1,2 @@
+import 'dotenv/config'; import { createServer } from 'node:http'; import { Server } from 'socket.io'; import app from './app.js'; import { connectDatabase } from './config/db.js'; import { registerSocketHandlers } from './socket/socketHandler.js';
+const httpServer = createServer(app); const io = new Server(httpServer, { cors: { origin: process.env.CLIENT_URL || 'http://localhost:5173', methods: ['GET', 'POST'] } }); registerSocketHandlers(io); connectDatabase(); httpServer.listen(process.env.PORT || 5000, () => console.log(`API listening on ${process.env.PORT || 5000}`));
