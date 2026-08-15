@@ -1,5 +1,13 @@
 import express from 'express'; import cors from 'cors'; import helmet from 'helmet'; import rateLimit from 'express-rate-limit'; import cookieParser from 'cookie-parser'; import path from 'node:path'; import { fileURLToPath } from 'node:url'; import userRoutes from './routes/userRoutes.js'; import chatRoutes from './routes/chatRoutes.js'; import authRoutes from './routes/authRoutes.js'; import { errorHandler } from './middleware/errorHandler.js';
 const app = express();
+
+// Configure Express trust proxy to support deployments behind proxies/load-balancers
+// Set `TRUST_PROXY=true` in env to enable (or set to a number/string accepted by Express).
+if (process.env.TRUST_PROXY === 'true' || process.env.TRUST_PROXY === '1' || (process.env.NODE_ENV === 'production' && process.env.TRUST_PROXY === undefined)) {
+	app.set('trust proxy', 1);
+} else if (process.env.TRUST_PROXY) {
+	app.set('trust proxy', process.env.TRUST_PROXY);
+}
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const clientDist = path.resolve(directory, '../../client/dist');
 const allowedOrigins = process.env.CLIENT_URL?.split(',') || ['http://localhost:5173', 'http://localhost:5000'];
