@@ -1,10 +1,15 @@
 import express from 'express'; import cors from 'cors'; import helmet from 'helmet'; import rateLimit from 'express-rate-limit'; import cookieParser from 'cookie-parser'; import path from 'node:path'; import { fileURLToPath } from 'node:url'; import userRoutes from './routes/userRoutes.js'; import chatRoutes from './routes/chatRoutes.js'; import authRoutes from './routes/authRoutes.js'; import { errorHandler } from './middleware/errorHandler.js';
-const app = express(); 
-const directory = path.dirname(fileURLToPath(import.meta.url)); 
-const clientDist = path.resolve(directory, '../../client/dist'); 
-const allowedOrigins = process.env.CLIENT_URL?.split(',') || ['http://localhost:5173', 'http://localhost:5000']; 
-app.use(helmet()); app.use(cors({ origin: allowedOrigins, credentials: true })); 
-app.use(express.json({ limit: '20kb' })); 
-app.use(cookieParser()); 
-app.use('/api', rateLimit({ windowMs: 60_000, limit: 120 })); 
+const app = express();
+const directory = path.dirname(fileURLToPath(import.meta.url));
+const clientDist = path.resolve(directory, '../../client/dist');
+const allowedOrigins = process.env.CLIENT_URL?.split(',') || ['http://localhost:5173', 'http://localhost:5000'];
+const allowAllOrigins = process.env.ALLOW_ALL_ORIGINS === 'true';
+const corsOptions = allowAllOrigins
+	? { origin: true, credentials: true }
+	: { origin: allowedOrigins, credentials: true };
+app.use(helmet());
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '20kb' }));
+app.use(cookieParser());
+app.use('/api', rateLimit({ windowMs: 60_000, limit: 120 }));
 app.get('/api/health', (req, res) => res.json({ status: 'ok' })); app.use('/api/auth', authRoutes); app.use('/api/users', userRoutes); app.use('/api/chats', chatRoutes); app.use(express.static(clientDist)); app.get('*', (req, res) => res.sendFile(path.join(clientDist, 'index.html'))); app.use(errorHandler); export default app;
