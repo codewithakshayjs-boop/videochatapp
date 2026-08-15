@@ -8,6 +8,17 @@ const publicUser = (user) => ({ _id: user._id, name: user.name, username: user.u
 function sendSession(res, user, rememberMe = false) { const token = jwt.sign({ sub: user._id, username: user.username }, process.env.JWT_SECRET || 'development-only-secret-change-me', { expiresIn: rememberMe ? '30d' : '1d' }); res.cookie('sparklink_session', token, cookieOptions(rememberMe)).json({ success: true, user: publicUser(user) }); }
 
 export async function register(req, res) { const account = authSchema.parse(req.body); const profile = userSchema.parse(req.body); if (!isAdult(profile.dateOfBirth)) return res.status(422).json({ success: false, message: 'You must be 18 or older to use video chat.' }); const exists = await User.exists({ username: account.username }); if (exists) return res.status(409).json({ success: false, message: 'That username is already in use.' }); const user = await User.create({ ...profile, username: account.username, passwordHash: await bcrypt.hash(account.password, 12), lastLogin: new Date() }); sendSession(res.status(201), user, Boolean(req.body.rememberMe)); }
-export async function login(req, res) { const { username, password } = authSchema.parse(req.body); const user = await User.findOne({ username }).select('+passwordHash'); if (!user || !user.passwordHash || !(await bcrypt.compare(password, user.passwordHash))) return res.status(401).json({ success: false, message: 'Incorrect username or password.' }); user.lastLogin = new Date(); await user.save(); sendSession(res, user, Boolean(req.body.rememberMe)); }
+export async function login(req, res) {
+    const { username, password } = authSchema.parse(req.body);
+    const results = await User.find({ username }).select('+passwordHash').limit(1);
+    const user = Array.isArray(results) && results.length === 1 ? results[0] : null;
+
+    if (!user || !user.passwordHash || !(await bcrypt.compare(password, user.passwordHash)))
+        return res.status(401).json({ success: false, message: 'Incorrect username or password.' });
+
+    user.lastLogin = new Date();
+    await user.save();
+    sendSession(res, user, Boolean(req.body.rememberMe));
+}
 export async function logout(req, res) { res.clearCookie('sparklink_session', { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' }).json({ success: true }); }
 export async function currentUser(req, res) { const token = req.cookies.sparklink_session; if (!token) return res.status(401).json({ success: false, message: 'Not signed in.' }); try { const payload = jwt.verify(token, process.env.JWT_SECRET || 'development-only-secret-change-me'); const user = await User.findById(payload.sub); if (!user) return res.status(401).json({ success: false, message: 'Session expired.' }); res.json({ success: true, user: publicUser(user) }); } catch { res.status(401).json({ success: false, message: 'Session expired.' }); } }
