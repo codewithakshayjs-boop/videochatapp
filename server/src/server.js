@@ -15,3 +15,5 @@ const io = new Server(httpServer, { cors: { origin: allowedOrigins, methods: ['G
         process.exit(1);
     }
 })();
+
+
