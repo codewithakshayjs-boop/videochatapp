@@ -24,6 +24,8 @@ export async function connectDatabase({ maxRetries = 5, retryDelay = 2000 } = {}
 
   // Disable mongoose buffering so queries fail fast when no connection is available
   mongoose.set('bufferCommands', false);
+  // Make buffer timeouts immediate in serverless environments
+  mongoose.set('bufferTimeoutMS', 0);
 
   let attempt = 0;
   while (attempt < maxRetries) {
