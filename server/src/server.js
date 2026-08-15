@@ -1,13 +1,8 @@
 import 'dotenv/config'; import { createServer } from 'node:http'; import { Server } from 'socket.io'; import app from './app.js'; import { connectDatabase } from './config/db.js'; import { registerSocketHandlers } from './socket/socketHandler.js';
 
-const allowedOrigins = process.env.CLIENT_URL?.split(',') || ['http://localhost:5173', 'http://localhost:5000'];
-const allowAllOrigins = process.env.ALLOW_ALL_ORIGINS === 'true';
-const ioCors = allowAllOrigins
-    ? { origin: true, methods: ['GET', 'POST'], credentials: true }
-    : { origin: allowedOrigins, methods: ['GET', 'POST'], credentials: true };
-
+// Allow all origins by reflecting the request origin (required for credentials).
 const httpServer = createServer(app);
-const io = new Server(httpServer, { cors: ioCors });
+const io = new Server(httpServer, { cors: { origin: true, methods: ['GET', 'POST'], credentials: true } });
 
 (async function start() {
     try {

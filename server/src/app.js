@@ -25,9 +25,8 @@ if (process.env.TRUST_PROXY === 'true' || process.env.TRUST_PROXY === '1' || (pr
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const clientDist = path.resolve(directory, '../../client/dist');
-const allowedOrigins = process.env.CLIENT_URL?.split(',') || ['http://localhost:5173', 'http://localhost:5000'];
-const allowAllOrigins = process.env.ALLOW_ALL_ORIGINS === 'true';
-const corsOptions = allowAllOrigins ? { origin: true, credentials: true } : { origin: allowedOrigins, credentials: true };
+// Allow all origins by reflecting the request origin (needed for cookies/credentials).
+const corsOptions = { origin: true, credentials: true };
 
 app.use(helmet());
 app.use(cors(corsOptions));
