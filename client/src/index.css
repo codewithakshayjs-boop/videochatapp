@@ -85,3 +85,5 @@
 .peer-details{display:inline-flex;align-items:center;gap:7px;margin-top:4px;padding:6px 9px;border-radius:999px;background:#311226bb;border:1px solid #ffffff35;font-size:12px}.peer-details span{text-transform:capitalize;color:#ffd1e2}
 .chat-duration{flex:none;padding:5px 7px;border-radius:7px;background:#ffffff16;color:#ffd5e5;font:10px 'DM Mono';white-space:nowrap}
 @media(max-width:700px){.chat-duration{font-size:9px;padding:4px 5px}.chat-header{gap:6px}.chat-header span{display:none}}
+.video-frame.safety-blurred video{filter:blur(28px);transform:scale(1.08)}
+.safety-notice{padding:7px 10px;border:1px solid #f6b28d;border-radius:7px;background:#fff0e8;color:#9d351b;font-size:11px;font-weight:700}
