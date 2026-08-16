@@ -10,8 +10,8 @@ const formatDuration = (milliseconds) => {
 
 export default function ChatDuration({ startedAt, endedAt = null, label = 'Chat time' }) {
   const [now, setNow] = useState(Date.now());
-  useEffect(() => { if (endedAt) return undefined; const interval = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(interval); }, [endedAt]);
-  const duration = (endedAt || now) - startedAt;
+  useEffect(() => { if (endedAt !== null) return undefined; const interval = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(interval); }, [endedAt]);
+  const duration = (endedAt !== null ? endedAt : now) - startedAt;
   return <span className="chat-duration">◷ {label} {formatDuration(duration)}</span>;
 }
 
