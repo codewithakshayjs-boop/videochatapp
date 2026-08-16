@@ -52,6 +52,7 @@
   .room-copy h1{white-space:nowrap}
   .chat-controls{box-shadow:0 9px 30px #16061180}
   .chat-controls button{min-height:44px;border-radius:12px}
+  .chat-controls button:disabled{opacity:.65}
 }
 
 @media(max-width:380px){
