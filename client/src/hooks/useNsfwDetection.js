@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import * as nsfwjs from 'nsfwjs';
 
 const BLOCKED_CATEGORIES = { Porn: 0.7, Hentai: 0.7, Sexy: 0.8 };
 
@@ -17,7 +16,7 @@ export function useNsfwDetection({ enabled, videoRefs, onSafetyChange }) {
   useEffect(() => {
     let active = true;
     if (!enabled || model.current) return undefined;
-    nsfwjs.load().then((loadedModel) => {
+    import('nsfwjs').then((nsfwjs) => nsfwjs.load()).then((loadedModel) => {
       if (!active) return;
       model.current = loadedModel;
       setReady(true);
