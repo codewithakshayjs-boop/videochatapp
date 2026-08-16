@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import path from 'node:path';
+import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import mongoose from 'mongoose';
 
@@ -52,6 +53,34 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chats', chatRoutes);
+
+// Public sitemap for SEO / Google bot
+const sitemapPaths = [
+    '/',
+    '/auth/login',
+    '/auth/register',
+    '/profile',
+    '/profile/name',
+    '/profile/dob',
+    '/confirmation',
+    '/searching',
+    '/chat',
+    '/messages',
+];
+
+app.get('/sitemap.xml', (req, res) => {
+    // Prefer a built sitemap in clientDist if present (survives client build if produced there)
+    const built = path.join(clientDist, 'sitemap.xml');
+    if (fs.existsSync(built)) return res.sendFile(built);
+
+    const base = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+    const lastmod = new Date().toISOString().slice(0, 10);
+    const urlEntries = sitemapPaths
+        .map((p) => `  <url>\n    <loc>${base}${p}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>`)
+        .join('\n');
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlEntries}\n</urlset>`;
+    res.type('application/xml').send(xml);
+});
 
 app.use(express.static(clientDist));
 app.get('*', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
