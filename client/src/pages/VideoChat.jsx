@@ -10,6 +10,30 @@ import ChatDuration, { formatDuration } from '../components/ChatDuration';
 import Button from '../components/Button';
 import { useNsfwDetection } from '../hooks/useNsfwDetection';
 
+async function getFlippedCameraStream(nextFacing, currentTrack) {
+  const currentDeviceId = currentTrack.getSettings?.().deviceId;
+  let preferredStream;
+  try {
+    // `exact` frequently fails on Android even when the requested camera exists.
+    preferredStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: nextFacing } }, audio: false });
+    const preferredTrack = preferredStream.getVideoTracks()[0];
+    if (preferredTrack && preferredTrack.getSettings?.().deviceId !== currentDeviceId) return preferredStream;
+    preferredStream.getTracks().forEach((track) => track.stop());
+  } catch {
+    // Some Android browsers do not implement facingMode reliably; try device IDs.
+  }
+
+  const cameras = await navigator.mediaDevices.enumerateDevices();
+  const alternateCameras = cameras.filter((device) => device.kind === 'videoinput' && device.deviceId !== currentDeviceId);
+  let lastError;
+  for (const camera of alternateCameras) {
+    try {
+      return await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: camera.deviceId } }, audio: false });
+    } catch (error) { lastError = error; }
+  }
+  throw lastError || new Error('No alternate camera is available.');
+}
+
 export default function VideoChat() {
   const { stream, stopStream, user, setChatMode } = useChat();
   const { socket } = useSocket();
@@ -65,7 +89,7 @@ export default function VideoChat() {
     setFlipping(true);
     let cameraStream;
     try {
-      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: nextFacing } }, audio: false });
+      cameraStream = await getFlippedCameraStream(nextFacing, oldTrack);
       const newTrack = cameraStream.getVideoTracks()[0];
       newTrack.enabled = oldTrack.enabled;
       await replaceVideoTrack(oldTrack, newTrack);
