@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
 const BLOCKED_CATEGORIES = { Porn: 0.7, Hentai: 0.7, Sexy: 0.8 };
+// Keep raw model weights outside the Vite bundle. This avoids memory-intensive
+// compilation of NSFWJS's embedded, base64-encoded model assets on Render.
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/infinitered/nsfwjs@master/models/mobilenet_v2/model.json';
 
 function isUnsafe(predictions) {
   return predictions.some(({ className, probability }) => probability >= (BLOCKED_CATEGORIES[className] ?? Number.POSITIVE_INFINITY));
@@ -16,7 +19,7 @@ export function useNsfwDetection({ enabled, videoRefs, onSafetyChange }) {
   useEffect(() => {
     let active = true;
     if (!enabled || model.current) return undefined;
-    import('nsfwjs').then((nsfwjs) => nsfwjs.load()).then((loadedModel) => {
+    import('nsfwjs/core').then(({ load }) => load(MODEL_URL)).then((loadedModel) => {
       if (!active) return;
       model.current = loadedModel;
       setReady(true);
