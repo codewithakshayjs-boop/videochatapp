@@ -11,4 +11,61 @@
 @media(max-width:700px){
   body{background:#fff7fa}.home{min-height:100dvh;padding:calc(16px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));background:radial-gradient(circle at 100% 3%,#ffd1e3 0,transparent 34%),#fff9fb}.home nav{min-height:44px}.home nav .button{padding:10px 13px;font-size:12px;border-radius:9px}.home nav .button.ghost{display:none}.home .welcome{display:none}.hero{margin:26px auto 36px;gap:22px}.hero-art{order:0;height:245px;border-radius:32px;background:linear-gradient(135deg,#ffe5ef,#f9b6d1)}.hero h1{font-size:46px;line-height:1.01;letter-spacing:-2.8px;margin:4px 0 16px}.hero-copy{display:flex;flex-direction:column}.eyebrow{font-size:10px}.lede{font-size:14px;line-height:1.6}.hero-button{width:100%;display:flex;align-items:center;justify-content:space-between;padding:17px 20px;margin-top:12px;border-radius:14px;font-size:15px;box-shadow:0 13px 26px #dc1b6735}.hero-button b{margin-left:0}.hero small{font-size:10px;text-align:center;margin:14px auto 0}.floating-card{font-size:10px}.one{right:13px;top:17px}.two{left:13px;bottom:18px}.steps{display:flex;overflow-x:auto;gap:12px;margin:0 -18px;padding:19px 18px 4px;border-top:1px solid #f4d9e5;scroll-snap-type:x mandatory}.steps>div{min-width:190px;padding:15px;border-radius:13px;background:#fff;border:1px solid #f5e0e9;scroll-snap-align:start;box-shadow:0 6px 16px #cf2f6510}.steps p{font-size:12px}.setup-page{min-height:100dvh;padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#ffe9f2 0,#fff 34%)}.setup-page>.brand{display:block;padding:2px 2px 16px}.setup-card,.search-card{width:calc(100% + 36px);min-height:calc(100dvh - 75px);margin:0 -18px;padding:35px 24px 28px;border-radius:28px 28px 0 0;border-width:1px 0 0;box-shadow:none}.setup-card h1,.search-card h1{font-size:29px;letter-spacing:-1.3px}.setup-card .button{border-radius:13px;padding:16px}.gender-grid{gap:12px;margin-top:22px}.gender-card{min-height:150px;border-radius:16px}.gender-card span{font-size:42px}.form-input{padding:16px;border-radius:12px}.summary{margin-top:23px}.summary div{padding:15px 0}.search-card{display:flex;flex-direction:column;justify-content:center;text-align:center}.search-card+.button{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:20px;right:20px;width:calc(100% - 40px);z-index:3;border-radius:13px;background:#fff;color:#c70f58;border-color:#efb4cd}.chat-page{height:100dvh;padding:0;background:#2d1025}.chat-header{height:calc(58px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 15px 0}.chat-header button{padding:7px 9px;font-size:11px}.room{height:calc(100dvh - 58px - env(safe-area-inset-top));border-radius:20px 20px 0 0}.local{width:31vw;max-width:145px;right:14px;top:15px;border-radius:11px}.room-copy{left:17px;top:17px}.chat-controls{width:calc(100% - 28px);justify-content:space-between;bottom:calc(14px + env(safe-area-inset-bottom));border-radius:17px;padding:7px}.chat-controls button{flex:1;padding:12px 4px;font-size:10px}.call-ended h1{font-size:27px}.call-ended>div{padding:23px}.password-input button{top:10px}.remember-check{padding:5px 0 9px}
 }
-@media(max-width:700px){.home nav{gap:6px}.home nav .brand{font-size:21px;letter-spacing:-1.5px;white-space:nowrap}.home nav .brand i{width:25px;height:25px;font-size:17px;margin-right:4px}.home nav .button.ghost{display:inline-flex}.home .welcome{display:block;max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}.home nav .button{padding:9px 9px;font-size:11px;white-space:nowrap}}
+/* Phone-first polish: each route reads as a focused app screen rather than a scaled web page. */
+@media(max-width:700px){
+  html,body,#root{min-height:100%;min-height:100dvh}
+  body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
+  button,a,input{touch-action:manipulation}
+  .button{min-height:48px}
+  .home nav{gap:7px;align-items:center}
+  .home nav .brand{font-size:21px;letter-spacing:-1.5px;white-space:nowrap;margin-right:auto}
+  .home nav .brand i{width:25px;height:25px;font-size:17px;margin-right:4px}
+  .home .welcome{display:none}
+  .home nav .button{min-height:39px;padding:9px 11px;font-size:11px;white-space:nowrap;box-shadow:none}
+  .home nav .button.ghost{display:inline-flex}
+  .home .hero-copy{padding:4px 2px 0}
+  .hero-art{box-shadow:0 16px 34px #d9367830}
+  .steps{padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+  .steps::-webkit-scrollbar{display:none}
+  .steps>div{min-height:132px}
+
+  .setup-page>.brand{padding-left:3px}
+  .setup-card,.search-card{display:flex;flex-direction:column}
+  .setup-card .progress{flex:none}
+  .setup-card>p{max-width:330px}
+  .setup-card .button:not(.ghost){margin-top:auto}
+  .setup-card .back-link{margin-top:17px;margin-bottom:0}
+  .gender-grid{grid-template-columns:repeat(2,1fr);margin-bottom:24px}
+  .gender-card{min-height:132px;padding:12px;justify-content:center;align-items:center;flex-direction:column}
+  .gender-card:focus-visible,.button:focus-visible,.chat-controls button:focus-visible{outline:3px solid #f59ac0;outline-offset:3px}
+  .form-input{min-height:52px;font-size:16px}
+  .password-input button{min-height:36px}
+  .summary{margin-bottom:24px}
+  .search-card{min-height:calc(100dvh - 75px);padding-bottom:105px}
+  .search-card+.button{min-height:50px;box-shadow:0 12px 30px #b5285d20}
+
+  .chat-header{gap:10px}
+  .chat-header .brand{flex:none}
+  .chat-header span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .chat-header button{flex:none;min-height:34px}
+  .room-copy{max-width:calc(100% - 145px)}
+  .room-copy h1{white-space:nowrap}
+  .chat-controls{box-shadow:0 9px 30px #16061180}
+  .chat-controls button{min-height:44px;border-radius:12px}
+}
+
+@media(max-width:380px){
+  .home{padding-left:14px;padding-right:14px}
+  .home nav .brand{font-size:19px}
+  .home nav .button{padding:8px 8px;font-size:10px}
+  .hero h1{font-size:41px}
+  .setup-page{padding-left:14px;padding-right:14px}
+  .setup-card,.search-card{width:calc(100% + 28px);margin-left:-14px;margin-right:-14px;padding-left:20px;padding-right:20px}
+  .chat-controls button{font-size:9px}
+}
+
+@media(max-width:700px) and (orientation:landscape) and (max-height:540px){
+  .home{overflow:auto}.hero{grid-template-columns:1fr 1fr;gap:26px;margin:20px auto}.hero-art{height:220px}.steps{display:none}
+  .setup-page>.brand{padding-bottom:8px}.setup-card,.search-card{min-height:0;margin-top:0;padding-top:22px;border-radius:20px}.setup-card .progress{margin-bottom:18px}.gender-card{min-height:82px}.gender-card span{font-size:27px}
+  .chat-header{height:46px}.room{height:calc(100dvh - 46px)}.local{width:20vw;top:10px}.chat-controls{bottom:10px}.chat-controls button{min-height:36px;padding:8px 5px}
+}
