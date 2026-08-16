@@ -29,7 +29,15 @@ const clientDist = path.resolve(directory, '../../client/dist');
 // Allow all origins by reflecting the request origin (needed for cookies/credentials).
 const corsOptions = { origin: true, credentials: true };
 
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            // NSFWJS and TensorFlow.js are loaded on demand for video moderation.
+            scriptSrc: ["'self'", 'https://cdn.jsdelivr.net'],
+            connectSrc: ["'self'", 'https://cdn.jsdelivr.net'],
+        },
+    },
+}));
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '20kb' }));
 app.use(cookieParser());
