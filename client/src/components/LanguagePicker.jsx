@@ -1,0 +1,2 @@
+import { useLanguage } from '../context/LanguageContext';
+export default function LanguagePicker() { const { chooseLanguage, t } = useLanguage(); return <main className="language-page"><section className="language-card"><div className="language-icon">☕</div><h1>{t('languagePrompt')}</h1><p>{t('languageHelp')}</p><div><button onClick={() => chooseLanguage('en')}>{t('english')}</button><button onClick={() => chooseLanguage('hi')}>{t('hindi')}</button></div></section></main>; }
