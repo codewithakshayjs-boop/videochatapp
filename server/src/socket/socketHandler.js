@@ -1,6 +1,38 @@
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 import { enqueue, remove } from '../services/matchmakingService.js';
+
 export function registerSocketHandlers(io) {
+ const authenticatedSockets = new Map();
+ const setAuthenticatedUser = async (socket, userId, version) => {
+  if (!userId) {
+   authenticatedSockets.delete(socket.id);
+   return;
+  }
+  const userExists = mongoose.connection.readyState === 1 && await User.exists({ _id: userId });
+  if (version === socket.data.presenceVersion && userExists) authenticatedSockets.set(socket.id, String(userId));
+ };
+ const broadcastPresence = async () => {
+   const online = new Set(authenticatedSockets.values()).size;
+    const totalUsers = mongoose.connection.readyState === 1 ? await User.countDocuments() : online;
+    io.emit('presence-update', { online, offline: Math.max(0, totalUsers - online) });
+ };
  io.on('connection', (socket) => {
+  socket.data.presenceVersion = 0;
+  const token = socket.handshake.headers.cookie?.match(/(?:^|; )sparklink_session=([^;]+)/)?.[1];
+  if (token) {
+   try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'development-only-secret-change-me');
+    setAuthenticatedUser(socket, payload.sub, socket.data.presenceVersion).then(() => broadcastPresence()).catch(() => {});
+   } catch { broadcastPresence().catch(() => {}); }
+  } else broadcastPresence().catch(() => {});
+   socket.on('presence-auth', (userId) => {
+  const version = ++socket.data.presenceVersion;
+  setAuthenticatedUser(socket, typeof userId === 'string' && userId.trim() ? userId : null, version)
+   .then(() => broadcastPresence()).catch(() => {});
+   });
+   socket.on('request-presence', () => broadcastPresence().catch(() => {}));
   socket.on('join-queue', ({ userId, name, gender, mode = 'video' }) => { socket.data.userId = userId; socket.data.gender = gender; socket.data.profile = { name: typeof name === 'string' && name.trim() ? name.trim().slice(0, 50) : 'Chai friend', gender: typeof gender === 'string' ? gender : '' }; socket.data.mode = ['text', 'audio', 'video'].includes(mode) ? mode : 'video'; const stranger = enqueue(socket); if (!stranger) return socket.emit('queue-status', { status: 'waiting' }); const roomId = [socket.id, stranger.id].sort().join(':'); socket.join(roomId); stranger.join(roomId); socket.data.roomId = stranger.data.roomId = roomId; socket.emit('match-found', { peerId: stranger.id, initiator: true, mode: socket.data.mode, peerProfile: stranger.data.profile, peerName: stranger.data.profile.name, peerGender: stranger.data.profile.gender }); stranger.emit('match-found', { peerId: socket.id, initiator: false, mode: stranger.data.mode, peerProfile: socket.data.profile, peerName: socket.data.profile.name, peerGender: socket.data.profile.gender }); });
   socket.on('leave-queue', () => remove(socket.id));
   socket.on('signal', ({ to, signal }) => io.to(to).emit('signal', { from: socket.id, signal }));
@@ -8,6 +40,6 @@ export function registerSocketHandlers(io) {
   const leave = (reason) => { remove(socket.id); if (socket.data.roomId) { socket.to(socket.data.roomId).emit('stranger-left', { reason }); socket.leave(socket.data.roomId); socket.data.roomId = null; } };
   socket.on('next-stranger', () => leave('next'));
   socket.on('end-call', () => leave('user-ended'));
-  socket.on('disconnect', () => leave('disconnect'));
+   socket.on('disconnect', () => { authenticatedSockets.delete(socket.id); leave('disconnect'); broadcastPresence().catch(() => {}); });
  });
 }
